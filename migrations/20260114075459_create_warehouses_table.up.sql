@@ -8,3 +8,9 @@ CREATE TABLE IF NOT EXISTS public.warehouses (
   updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   deleted_at timestamp with time zone
 );
+
+ALTER TABLE public.warehouses
+ADD CONSTRAINT uni_warehouses_name UNIQUE (name);
+
+CREATE INDEX IF NOT EXISTS idx_warehouses_deleted_at ON public.warehouses (deleted_at);
+CREATE INDEX IF NOT EXISTS idx_warehouses_name ON public.warehouses (name);
