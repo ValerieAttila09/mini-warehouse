@@ -1,11 +1,11 @@
-use crate::models::{users::User};
-use crate::configs::db::DBPool;
+use crate::models::{user::User};
+use crate::configs::db::DbPool;
 
-pub async fn find_user_with_role_by_email(pool: &DBPool, email: &str) -> sqlx::Result<Option<User, Option<String>>> {
+pub async fn find_user_with_role_by_email(pool: &DbPool, email: &str) -> sqlx::Result<Option<(User, Option<String>)>> {
   let user = sqlx::query_as!(
     User,
     r#"
-    SELECT id, name, email, password, photo, phone
+    SELECT id, name, email, password, photo, phone, created_at, updated_at
     FROM public.users
     WHERE email = $1
     "#,
@@ -13,7 +13,7 @@ pub async fn find_user_with_role_by_email(pool: &DBPool, email: &str) -> sqlx::R
   ).fetch_optional(pool).await?;
 
   if let Some(user) = user {
-    let role: Option<{String}> = sqlx::query_as(
+    let role = sqlx::query_as::<_, (String,)>(
       r#"
       SELECT r.name FROM public.user_role ur
       JOIN public.roles r ON ur.role_id = r.id
@@ -21,8 +21,8 @@ pub async fn find_user_with_role_by_email(pool: &DBPool, email: &str) -> sqlx::R
       "#,
     ).bind(user.id).fetch_optional(pool).await?;
 
-    Ok(Some((user, role.map(|t| t.0))));
+    Ok(Some((user, role.map(|t| t.0))))
   } else {
-    Ok(None);
+    Ok(None)
   }
 }

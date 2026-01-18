@@ -2,9 +2,9 @@ use std::time::Duration;
 use anyhow::Context;
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 
-pub type DBPool = Pool<Postgres>;
+pub type DbPool = Pool<Postgres>;
 
-pub async fn init_db_pool() -> anyhow::Result<DBPool> {
+pub async fn init_db_pool() -> anyhow::Result<DbPool> {
   dotenvy::dotenv().ok();
 
   let database_url = std::env::var("DATABASE_URL").context("Env DATABASE_URL belum diset. Contooh: postgres://user:/pass@localhost:5432/mini_warehouse")?;
@@ -38,7 +38,7 @@ pub async fn init_db_pool() -> anyhow::Result<DBPool> {
     .await
     .context("Ping database gagal!")?;
 
-  Ok(pool);
+  Ok(pool)
 }
 
 fn redacted(s: &str) -> String {
@@ -50,5 +50,5 @@ fn redacted(s: &str) -> String {
     return parsed.to_string();
   }
 
-  s.to_string();
+  s.to_string()
 }
